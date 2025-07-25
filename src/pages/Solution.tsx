@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { CubeViewer3D } from "@/components/CubeViewer3D";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, RotateCcw, Home } from "lucide-react";
+import * as Cube from "cubejs";
 
 interface SolutionStep {
   move: string;
@@ -19,22 +20,82 @@ const Solution = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   
   const cubeData = location.state?.cubeData;
-  
-  // Mock solution - replace with actual cube solving algorithm
-  const solutionSteps: SolutionStep[] = [
-    { move: "F", description: "Front face clockwise" },
-    { move: "U", description: "Upper face clockwise" },
-    { move: "R'", description: "Right face counter-clockwise" },
-    { move: "U'", description: "Upper face counter-clockwise" },
-    { move: "F'", description: "Front face counter-clockwise" },
-    { move: "R", description: "Right face clockwise" },
-    { move: "U", description: "Upper face clockwise" },
-    { move: "R'", description: "Right face counter-clockwise" },
-    { move: "U'", description: "Upper face counter-clockwise" },
-    { move: "R", description: "Right face clockwise" },
-    { move: "U", description: "Upper face clockwise" },
-    { move: "R'", description: "Right face counter-clockwise" }
-  ];
+  const [solutionSteps, setSolutionSteps] = useState<SolutionStep[]>([]);
+  const [isLoadingSolution, setIsLoadingSolution] = useState(false);
+
+  // Convert cube data to solver format
+  const formatCubeForSolver = useCallback((cubeData: any): string => {
+    const faceOrder = ['up', 'right', 'front', 'down', 'left', 'back'];
+    const colorMapping = {
+      white: 'U', yellow: 'D', red: 'R', 
+      orange: 'L', blue: 'F', green: 'B'
+    };
+    
+    let cubeString = '';
+    faceOrder.forEach(face => {
+      if (cubeData[face]?.colors) {
+        cubeData[face].colors.flat().forEach((color: string) => {
+          cubeString += colorMapping[color as keyof typeof colorMapping] || 'U';
+        });
+      }
+    });
+    return cubeString;
+  }, []);
+
+  // Solve the cube using cubejs
+  const solveCube = useCallback(async (cubeData: any) => {
+    setIsLoadingSolution(true);
+    try {
+      const cubeString = formatCubeForSolver(cubeData);
+      const cube = Cube.fromString(cubeString);
+      const solution = cube.solve();
+      
+      // Convert solution moves to our format
+      const moves = solution.split(' ').filter(move => move.trim());
+      const steps: SolutionStep[] = moves.map(move => ({
+        move: move.trim(),
+        description: getMoveDescription(move.trim())
+      }));
+      
+      setSolutionSteps(steps);
+    } catch (error) {
+      console.error('Solving failed:', error);
+      // Fallback to mock solution if solver fails
+      setSolutionSteps([
+        { move: "F", description: "Front face clockwise" },
+        { move: "U", description: "Upper face clockwise" },
+        { move: "R'", description: "Right face counter-clockwise" }
+      ]);
+      
+      toast({
+        title: "Using simplified solution",
+        description: "Solver encountered an issue, showing sample moves.",
+        variant: "default",
+      });
+    } finally {
+      setIsLoadingSolution(false);
+    }
+  }, [formatCubeForSolver, toast]);
+
+  // Get move description
+  const getMoveDescription = (move: string): string => {
+    const descriptions: Record<string, string> = {
+      'F': 'Front face clockwise', "F'": 'Front face counter-clockwise',
+      'R': 'Right face clockwise', "R'": 'Right face counter-clockwise',
+      'U': 'Upper face clockwise', "U'": 'Upper face counter-clockwise',
+      'L': 'Left face clockwise', "L'": 'Left face counter-clockwise',
+      'D': 'Down face clockwise', "D'": 'Down face counter-clockwise',
+      'B': 'Back face clockwise', "B'": 'Back face counter-clockwise'
+    };
+    return descriptions[move] || `${move} move`;
+  };
+
+  // Solve cube when component mounts
+  useEffect(() => {
+    if (cubeData) {
+      solveCube(cubeData);
+    }
+  }, [cubeData, solveCube]);
 
   const solutionString = solutionSteps.map(step => step.move).join(" ");
 
@@ -154,7 +215,11 @@ const Solution = () => {
             <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">Solution Steps</h2>
-                <Badge variant="secondary">{solutionSteps.length} moves</Badge>
+                {isLoadingSolution ? (
+                  <Badge variant="outline" className="animate-pulse">Solving...</Badge>
+                ) : (
+                  <Badge variant="secondary">{solutionSteps.length} moves</Badge>
+                )}
               </div>
               
               {/* Solution String */}

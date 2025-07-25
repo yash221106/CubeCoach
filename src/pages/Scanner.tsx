@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { CubeViewer } from "@/components/CubeViewer";
 import { ImageCropper } from "@/components/ImageCropper";
 import { ColorGrid } from "@/components/ColorGrid";
 import { useToast } from "@/hooks/use-toast";
+import { useCubeState } from "@/hooks/useCubeState";
 
 export type CubeFace = 'front' | 'back' | 'up' | 'down' | 'left' | 'right';
 export type CubeColor = 'white' | 'yellow' | 'red' | 'orange' | 'blue' | 'green';
@@ -19,21 +20,22 @@ const Scanner = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [selectedFace, setSelectedFace] = useState<CubeFace>('front');
+  // Use custom hook for cube state management
+  const {
+    cubeState: cubeData,
+    currentFace: selectedFace,
+    setCurrentFace: setSelectedFace,
+    updateFaceColors,
+    getFaceColors,
+    getAllFacesScanned,
+    getScannedFacesCount
+  } = useCubeState();
+  
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [detectedColors, setDetectedColors] = useState<CubeColor[][] | null>(null);
   const [showColorGrid, setShowColorGrid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  const [cubeData, setCubeData] = useState<Record<CubeFace, FaceData>>({
-    front: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false },
-    back: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false },
-    up: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false },
-    down: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false },
-    left: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false },
-    right: { colors: Array(3).fill(null).map(() => Array(3).fill(null)), scanned: false }
-  });
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -49,22 +51,41 @@ const Scanner = () => {
     }
   };
 
-  const handleCropConfirm = async (croppedImageData: string) => {
+  // Color detection API integration point
+  const detectColors = useCallback(async (croppedBlob: Blob): Promise<CubeColor[][]> => {
+    // Replace this with your actual API call
+    const formData = new FormData();
+    formData.append('image', croppedBlob);
+    
+    // Example API call structure - replace with your actual endpoint
+    // const response = await fetch('/api/detect-colors', {
+    //   method: 'POST',
+    //   body: formData,
+    // });
+    // const result = await response.json();
+    // return result.colors;
+    
+    // Mock response for now - replace with actual API
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    const mockColors: CubeColor[][] = [
+      ['red', 'red', 'blue'],
+      ['red', 'red', 'red'],
+      ['white', 'red', 'red']
+    ];
+    return mockColors;
+  }, []);
+
+  const handleCropConfirm = useCallback(async (croppedImageData: string) => {
     setCroppedImage(croppedImageData);
     setIsProcessing(true);
     
     try {
-      // Simulate API call - replace with actual color detection API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Convert base64 to blob for API call
+      const response = await fetch(croppedImageData);
+      const blob = await response.blob();
       
-      // Mock detected colors - replace with actual API response
-      const mockColors: CubeColor[][] = [
-        ['red', 'red', 'blue'],
-        ['red', 'red', 'red'],
-        ['white', 'red', 'red']
-      ];
-      
-      setDetectedColors(mockColors);
+      const colors = await detectColors(blob);
+      setDetectedColors(colors);
       setShowColorGrid(true);
       
       toast({
@@ -72,6 +93,7 @@ const Scanner = () => {
         description: "Please verify and correct any mistakes.",
       });
     } catch (error) {
+      console.error('Color detection failed:', error);
       toast({
         title: "Detection failed",
         description: "Please try again with a clearer image.",
@@ -80,16 +102,10 @@ const Scanner = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [detectColors, toast]);
 
   const handleFaceConfirm = (colors: CubeColor[][]) => {
-    setCubeData(prev => ({
-      ...prev,
-      [selectedFace]: {
-        colors,
-        scanned: true
-      }
-    }));
+    updateFaceColors(selectedFace, colors);
     
     setUploadedImage(null);
     setCroppedImage(null);
@@ -102,7 +118,7 @@ const Scanner = () => {
     });
   };
 
-  const allFacesScanned = Object.values(cubeData).every(face => face.scanned);
+  const allFacesScanned = getAllFacesScanned();
 
   const handleSolveCube = () => {
     navigate('/solution', { state: { cubeData } });
@@ -133,7 +149,7 @@ const Scanner = () => {
               />
               <div className="mt-6 text-center">
                 <div className="text-sm text-muted-foreground mb-2">
-                  Progress: {Object.values(cubeData).filter(f => f.scanned).length}/6 faces scanned
+                  Progress: {getScannedFacesCount()}/6 faces scanned
                 </div>
                 <div className="flex gap-1 justify-center">
                   {Object.entries(cubeData).map(([face, data]) => (

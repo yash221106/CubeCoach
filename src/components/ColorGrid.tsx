@@ -7,11 +7,12 @@ interface ColorGridProps {
   colors: CubeColor[][];
   onConfirm: (colors: CubeColor[][]) => void;
   onRescan: () => void;
+  onColorEdit?: (row: number, col: number, color: CubeColor) => void;
 }
 
 const cubeColors: CubeColor[] = ['white', 'yellow', 'red', 'orange', 'blue', 'green'];
 
-export const ColorGrid = ({ colors: initialColors, onConfirm, onRescan }: ColorGridProps) => {
+export const ColorGrid = ({ colors: initialColors, onConfirm, onRescan, onColorEdit }: ColorGridProps) => {
   const [colors, setColors] = useState<CubeColor[][]>(initialColors);
   const [selectedSquare, setSelectedSquare] = useState<{row: number, col: number} | null>(null);
 
@@ -27,6 +28,10 @@ export const ColorGrid = ({ colors: initialColors, onConfirm, onRescan }: ColorG
         )
       );
       setColors(newColors);
+      
+      // Call parent's color edit handler if provided
+      onColorEdit?.(selectedSquare.row, selectedSquare.col, color);
+      
       setSelectedSquare(null);
     }
   };
