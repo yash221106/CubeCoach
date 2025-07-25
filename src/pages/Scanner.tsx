@@ -7,6 +7,7 @@ import { ImageCropper } from "@/components/ImageCropper";
 import { ColorGrid } from "@/components/ColorGrid";
 import { useToast } from "@/hooks/use-toast";
 import { useCubeState } from "@/hooks/useCubeState";
+import axios from "axios";
 
 export type CubeFace = 'front' | 'back' | 'up' | 'down' | 'left' | 'right';
 export type CubeColor = 'white' | 'yellow' | 'red' | 'orange' | 'blue' | 'green';
@@ -51,28 +52,57 @@ const Scanner = () => {
     }
   };
 
-  // Color detection API integration point
+  // Roboflow API color mapping
+  const colorMap = {
+    biru: "blue",
+    kuning: "yellow", 
+    merah: "red",
+    putih: "white",
+    hijau: "green",
+    oranye: "orange",
+  } as const;
+
+  // Grid sorting function from original code
+  const getColorGrid = (predictions: any[]) => {
+    // Sort by y-coordinate first, then x-coordinate to get row-by-row order
+    const sorted = [...predictions].sort((a, b) => a.y - b.y || a.x - b.x);
+    
+    // Apply horizontal flip as per original logic
+    const flipped = sorted.map((p, i, arr) => {
+      const row = Math.floor(i / 3);
+      const col = i % 3;
+      return arr[row * 3 + (2 - col)];
+    });
+    return [flipped.slice(0, 3), flipped.slice(3, 6), flipped.slice(6, 9)];
+  };
+
+  // Real Roboflow API integration
   const detectColors = useCallback(async (croppedBlob: Blob): Promise<CubeColor[][]> => {
-    // Replace this with your actual API call
     const formData = new FormData();
-    formData.append('image', croppedBlob);
+    formData.append("file", croppedBlob);
     
-    // Example API call structure - replace with your actual endpoint
-    // const response = await fetch('/api/detect-colors', {
-    //   method: 'POST',
-    //   body: formData,
-    // });
-    // const result = await response.json();
-    // return result.colors;
-    
-    // Mock response for now - replace with actual API
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    const mockColors: CubeColor[][] = [
-      ['red', 'red', 'blue'],
-      ['red', 'red', 'red'],
-      ['white', 'red', 'red']
-    ];
-    return mockColors;
+    try {
+      const res = await axios.post(
+        "https://detect.roboflow.com/rubik-color-detection-1wn9g/1?api_key=jLdnFo0BVFoFPQaf8n3F",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      let raw = res.data.predictions;
+      // Pad with 'putih' to ensure there are always 9 squares
+      while (raw.length < 9) {
+        raw.push({ class: "putih", confidence: 1, x: 0, y: 0 });
+      }
+
+      // Sort into 3x3 grid and map colors
+      const grid = getColorGrid(raw);
+      return grid.map(row => 
+        row.map(pred => colorMap[pred.class as keyof typeof colorMap] || 'white')
+      );
+    } catch (error) {
+      console.error('Color detection failed:', error);
+      throw new Error('Color detection failed. Please try again with a clearer image.');
+    }
   }, []);
 
   const handleCropConfirm = useCallback(async (croppedImageData: string) => {
@@ -80,7 +110,7 @@ const Scanner = () => {
     setIsProcessing(true);
     
     try {
-      // Convert base64 to blob for API call
+      // Convert image URL to blob for API call
       const response = await fetch(croppedImageData);
       const blob = await response.blob();
       
@@ -96,7 +126,7 @@ const Scanner = () => {
       console.error('Color detection failed:', error);
       toast({
         title: "Detection failed",
-        description: "Please try again with a clearer image.",
+        description: error instanceof Error ? error.message : "Please try again with a clearer image.",
         variant: "destructive",
       });
     } finally {
