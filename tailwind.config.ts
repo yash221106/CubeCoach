@@ -52,6 +52,16 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))',
+				cube: {
+					white: 'hsl(var(--cube-white))',
+					yellow: 'hsl(var(--cube-yellow))',
+					red: 'hsl(var(--cube-red))',
+					orange: 'hsl(var(--cube-orange))',
+					blue: 'hsl(var(--cube-blue))',
+					green: 'hsl(var(--cube-green))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -62,6 +72,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-cube': 'var(--gradient-cube)'
+			},
+			boxShadow: {
+				'glow': 'var(--shadow-glow)',
+				'cube': 'var(--shadow-cube)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +102,32 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'slide-in-right': {
+					'0%': { transform: 'translateX(100%)' },
+					'100%': { transform: 'translateX(0)' }
+				},
+				'cube-rotate': {
+					'0%': { transform: 'rotateX(-15deg) rotateY(-15deg)' },
+					'50%': { transform: 'rotateX(-15deg) rotateY(15deg)' },
+					'100%': { transform: 'rotateX(-15deg) rotateY(-15deg)' }
+				},
+				'pulse-glow': {
+					'0%, 100%': { boxShadow: 'var(--shadow-glow)' },
+					'50%': { boxShadow: '0 0 60px hsl(var(--primary) / 0.5)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'slide-in-right': 'slide-in-right 0.3s ease-out',
+				'cube-rotate': 'cube-rotate 6s ease-in-out infinite',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			}
 		}
 	},
