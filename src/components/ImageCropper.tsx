@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { drawCroppedImage } from "@/utils/drawCroppedImage";
 
 interface ImageCropperProps {
   image: string;
@@ -11,137 +10,194 @@ interface ImageCropperProps {
   isProcessing: boolean;
 }
 
-export const ImageCropper = ({ image, onCropConfirm, onCancel, isProcessing }: ImageCropperProps) => {
+export const ImageCropper = ({ 
+  image, 
+  onCropConfirm, 
+  onCancel, 
+  isProcessing 
+}: ImageCropperProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // State for crop box properties (position, size, rotation)
-  const [crop, setCrop] = useState({ x: 50, y: 50, size: 200, rotation: 0 });
-  
-  // State for mouse interactions
-  const [dragging, setDragging] = useState(false);
-  const [dragType, setDragType] = useState<'move' | 'resize' | 'rotate' | null>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  
-  // State for the scale of the displayed image on the canvas
-  const [scale, setScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [cropBox, setCropBox] = useState({
+    x: 50,
+    y: 50,
+    width: 200,
+    height: 200,
+    rotation: 0
+  });
 
-  // Effect to draw the image and crop box whenever the image or crop state changes
   useEffect(() => {
-    if (!image) return;
-    drawCroppedImage(image, crop, canvasRef, (_, scaleValue) => {
-      setScale(scaleValue);
-    }, 500);
-  }, [image, crop]);
+    drawCanvas();
+  }, [image, cropBox]);
 
-  /**
-   * Calculates the mouse position relative to the canvas, accounting for scaling.
-   */
-  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const drawCanvas = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: (e.clientX - rect.left) / scale,
-      y: (e.clientY - rect.top) / scale,
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      // Set canvas size
+      canvas.width = 400;
+      canvas.height = 400;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw image (scaled to fit)
+      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      const scaledWidth = img.width * scale;
+      const scaledHeight = img.height * scale;
+      const x = (canvas.width - scaledWidth) / 2;
+      const y = (canvas.height - scaledHeight) / 2;
+
+      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+      // Remove dark overlay and crop area clearing
+
+      // Draw crop box border
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.strokeRect(cropBox.x, cropBox.y, cropBox.width, cropBox.height);
+
+      // Draw corner handles
+      const handleSize = 10;
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(cropBox.x - handleSize/2, cropBox.y - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(cropBox.x + cropBox.width - handleSize/2, cropBox.y - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(cropBox.x - handleSize/2, cropBox.y + cropBox.height - handleSize/2, handleSize, handleSize);
+      ctx.fillRect(cropBox.x + cropBox.width - handleSize/2, cropBox.y + cropBox.height - handleSize/2, handleSize, handleSize);
     };
+    img.src = image;
   };
 
-  // Handles the start of a drag operation (move, resize, or rotate)
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const { x, y } = getMousePos(e);
-    const centerX = crop.x + crop.size / 2;
-    const centerY = crop.y + crop.size / 2;
-    const dx = x - centerX;
-    const dy = y - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    // Determine the drag type based on mouse position
-    if (distance > crop.size / 2 - 15 && distance < crop.size / 2 + 15) {
-      setDragType("rotate");
-    } else if (x > crop.x + crop.size - 15 && y > crop.y + crop.size - 15) {
-      setDragType("resize");
-    } else if (x > crop.x && x < crop.x + crop.size && y > crop.y && y < crop.y + crop.size) {
-      setDragType("move");
-    } else {
-      setDragType(null);
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if clicking on handles (resize)
+    const handleSize = 10;
+    const handles = [
+      { x: cropBox.x, y: cropBox.y },
+      { x: cropBox.x + cropBox.width, y: cropBox.y },
+      { x: cropBox.x, y: cropBox.y + cropBox.height },
+      { x: cropBox.x + cropBox.width, y: cropBox.y + cropBox.height }
+    ];
+
+    for (const handle of handles) {
+      if (
+        x >= handle.x - handleSize/2 && 
+        x <= handle.x + handleSize/2 &&
+        y >= handle.y - handleSize/2 && 
+        y <= handle.y + handleSize/2
+      ) {
+        setIsResizing(true);
+        return;
+      }
     }
 
-    setDragging(true);
-    setOffset({ x, y });
+    // Check if clicking inside crop box (drag)
+    if (
+      x >= cropBox.x && 
+      x <= cropBox.x + cropBox.width &&
+      y >= cropBox.y && 
+      y <= cropBox.y + cropBox.height
+    ) {
+      setIsDragging(true);
+    }
   };
 
-  // Handles mouse movement during a drag operation
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!dragging || !dragType) return;
-    const { x, y } = getMousePos(e);
-    const dx = x - offset.x;
-    const dy = y - offset.y;
-    setOffset({ x, y });
+    const canvas = canvasRef.current;
+    if (!canvas || (!isDragging && !isResizing)) return;
 
-    setCrop((prev) => {
-      switch (dragType) {
-        case "move":
-          return { ...prev, x: prev.x + dx, y: prev.y + dy };
-        case "resize":
-          const newSize = Math.max(50, prev.size + dx); // Ensure minimum size
-          return { ...prev, size: newSize };
-        case "rotate":
-          const cx = prev.x + prev.size / 2;
-          const cy = prev.y + prev.size / 2;
-          const angle = Math.atan2(y - cy, x - cx) * (180 / Math.PI);
-          return { ...prev, rotation: angle };
-        default:
-          return prev;
-      }
-    });
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (isDragging) {
+      setCropBox(prev => ({
+        ...prev,
+        x: Math.max(0, Math.min(canvas.width - prev.width, x - prev.width / 2)),
+        y: Math.max(0, Math.min(canvas.height - prev.height, y - prev.height / 2))
+      }));
+    }
+
+    if (isResizing) {
+      const centerX = cropBox.x + cropBox.width / 2;
+      const centerY = cropBox.y + cropBox.height / 2;
+      const newWidth = Math.abs(x - centerX) * 2;
+      const newHeight = Math.abs(y - centerY) * 2;
+      const size = Math.min(newWidth, newHeight, 250); // Keep it square and reasonable size
+
+      setCropBox(prev => ({
+        ...prev,
+        width: size,
+        height: size,
+        x: centerX - size / 2,
+        y: centerY - size / 2
+      }));
+    }
   };
 
-  // Handles the end of a drag operation
   const handleMouseUp = () => {
-    setDragging(false);
-    setDragType(null);
+    setIsDragging(false);
+    setIsResizing(false);
   };
 
-  const handleRotate = () => {
-    setCrop(prev => ({
+  const handleRotate = (degrees: number) => {
+    setCropBox(prev => ({
       ...prev,
-      rotation: (prev.rotation + 90) % 360
+      rotation: (prev.rotation + degrees) % 360
     }));
   };
 
-  // Confirms the crop and sends the cropped image data to the parent component
   const handleConfirmCrop = () => {
-    drawCroppedImage(image, crop, canvasRef, (canvas) => {
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = crop.size;
-      tempCanvas.height = crop.size;
-      const ctx = tempCanvas.getContext("2d");
-      if (!ctx) return;
+    // Use the original image for cropping, not the overlay canvas
+    const img = new window.Image();
+    img.onload = () => {
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = cropBox.width;
+      croppedCanvas.height = cropBox.height;
+      const croppedCtx = croppedCanvas.getContext('2d');
+      if (!croppedCtx) return;
 
-      // Translate and rotate to extract the cropped region correctly
-      ctx.translate(crop.size / 2, crop.size / 2);
-      ctx.rotate((crop.rotation || 0) * Math.PI / 180);
-      
-      // Draw the cropped part of the original canvas onto the temporary canvas
-      ctx.drawImage(
-        canvas,
-        crop.x * scale,
-        crop.y * scale,
-        crop.size * scale,
-        crop.size * scale,
-        -crop.size / 2,
-        -crop.size / 2,
-        crop.size,
-        crop.size
+      // Calculate scale and position as in drawCanvas
+      const canvasSize = 400;
+      const scale = Math.min(canvasSize / img.width, canvasSize / img.height);
+      const scaledWidth = img.width * scale;
+      const scaledHeight = img.height * scale;
+      const x = (canvasSize - scaledWidth) / 2;
+      const y = (canvasSize - scaledHeight) / 2;
+
+      // Draw the scaled image onto a temp canvas
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvasSize;
+      tempCanvas.height = canvasSize;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
+      tempCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+      // Crop from the temp canvas
+      croppedCtx.drawImage(
+        tempCanvas,
+        cropBox.x, cropBox.y, cropBox.width, cropBox.height,
+        0, 0, cropBox.width, cropBox.height
       );
 
-      // Get the cropped image as a blob and pass it to the onConfirm callback
-      tempCanvas.toBlob((blob) => {
-        if (blob && onCropConfirm) {
-          const croppedImageData = URL.createObjectURL(blob);
-          onCropConfirm(croppedImageData);
-        }
-      }, "image/jpeg");
-    }, 500);
+      // Convert to data URL
+      const croppedImageData = croppedCanvas.toDataURL('image/jpeg', 0.8);
+      onCropConfirm(croppedImageData);
+    };
+    img.src = image;
   };
 
   return (
@@ -149,17 +205,14 @@ export const ImageCropper = ({ image, onCropConfirm, onCancel, isProcessing }: I
       <Card className="p-4 bg-muted/10">
         <div className="text-center mb-4">
           <p className="text-sm text-muted-foreground">
-            Adjust Crop (Move, Resize ↘️, Rotate ⤾)
+            Adjust the square to frame the cube face perfectly
           </p>
         </div>
         
         <div className="flex justify-center mb-4">
           <canvas
             ref={canvasRef}
-            className="border border-border rounded-lg max-w-full"
-            style={{
-              cursor: dragging ? "grabbing" : "crosshair",
-            }}
+            className="border border-border rounded-lg cursor-crosshair max-w-full"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -167,13 +220,34 @@ export const ImageCropper = ({ image, onCropConfirm, onCancel, isProcessing }: I
           />
         </div>
 
-        <div className="flex justify-center mb-4">
+        <div className="flex flex-wrap gap-2 justify-center mb-4">
           <Button
-            onClick={handleRotate}
+            onClick={() => handleRotate(-15)}
             variant="outline"
             size="sm"
           >
-            🔄 Rotate 90°
+            ↺ -15°
+          </Button>
+          <Button
+            onClick={() => handleRotate(15)}
+            variant="outline"
+            size="sm"
+          >
+            ↻ +15°
+          </Button>
+          <Button
+            onClick={() => handleRotate(-90)}
+            variant="outline"
+            size="sm"
+          >
+            ↺ -90°
+          </Button>
+          <Button
+            onClick={() => handleRotate(90)}
+            variant="outline"
+            size="sm"
+          >
+            ↻ +90°
           </Button>
         </div>
       </Card>

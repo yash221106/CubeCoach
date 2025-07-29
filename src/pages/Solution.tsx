@@ -13,6 +13,7 @@ interface SolutionStep {
   description: string;
 }
 
+
 const Solution = () => {
   const location = useLocation();
   const navigate = useNavigate();
