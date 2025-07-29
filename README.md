@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# 🧠 AI-Powered Rubik's Cube Vision Solver
 
-## Project info
+**An intelligent web app that uses AI to scan, solve, and teach the Rubik's Cube. Features computer vision with a custom Roboflow model for color detection, an API for solving algorithms, and interactive 3D solution tutorials.**
 
-**URL**: https://lovable.dev/projects/82ec14e3-6175-4465-81e7-ef143ea2990e
+---
 
-## How can I edit this code?
+![Cube Solver Banner](https://placehold.co/1200x400/1a202c/71faef?text=AI+Cube+Vision&font=raleway)
 
-There are several ways of editing your application.
+## 🌟 Introduction
 
-**Use Lovable**
+This project is a modern, AI-driven web application designed to be the ultimate companion for Rubik's Cube enthusiasts. It leverages a powerful, custom-trained computer vision model to bridge the gap between a physical, scrambled cube and its digital solution. Users can simply present their cube to the application, and the AI pipeline will recognize the color configuration, query a solver API for the most efficient solution, and then teach the user the solution through an interactive 3D visualization.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/82ec14e3-6175-4465-81e7-ef143ea2990e) and start prompting.
+## ✨ Core Features
 
-Changes made via Lovable will be committed automatically to this repo.
+* **🤖 AI Vision Scanner:** Utilizes a custom computer vision model trained with **Roboflow** to accurately identify the location and color of each sticker from an uploaded image.
+* **💡 External Solver API Integration:** Once the cube's state is determined, the application communicates with a dedicated API to fetch the optimal solving algorithm.
+* **🎓 Interactive 3D Tutorials:** The app renders your scrambled cube in a fully interactive **3D environment** and animates each move of the solution, allowing you to follow along at your own pace.
+* **📚 Algorithm Library:** Explore a built-in library of common Rubik's Cube algorithms to deepen your understanding and improve your speed.
 
-**Use your preferred IDE**
+## 🛠️ Core Technologies
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Technology | Role & Description |
+| :--- | :--- |
+| **AI / Computer Vision** | A custom **Roboflow** model performs object detection and classification to read the cube's state. |
+| **Solver API** | An external API provides the core solving logic, returning the optimal move sequence. |
+| **3D Rendering** | The front-end uses 3D graphics to render the cube and animate the solution tutorial. |
+| **Web App Framework** | Built as a modern, single-page web application. |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## ⚙️ Application Workflow
 
-Follow these steps:
+1.  **Image Upload:** The user provides images of the six faces of the scrambled cube.
+2.  **AI Model Inference:** The custom **Roboflow** model is executed in the browser, returning the detected colors and their positions for each face.
+3.  **State Reconstruction:** The application processes the detection results to build a complete digital representation of the cube's state.
+4.  **API Solver Request:** The state string is sent to the external solving API.
+5.  **Solution Reception:** The API responds with an optimized sequence of moves.
+6.  **3D Visualization:** The initial scrambled state is rendered in **3D**, and the user can play through the received solution step-by-step.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+To get a local copy up and running, follow these simple steps.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Prerequisites
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+* Node.js (v16 or later)
+* npm
 
-**Edit a file directly in GitHub**
+### Installation
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1.  **Clone the repo**
+    ```sh
+    git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+    ```
+2.  **Navigate to the project directory**
+    ```sh
+    cd your-repo-name
+    ```
+3.  **Install NPM packages**
+    ```sh
+    npm install
+    ```
+4.  **Run the application**
+    ```sh
+    npm start
+    ```
+    The app will be available at `http://localhost:3000`.
 
-**Use GitHub Codespaces**
+## 🎯 Future Goals
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- [ ] Implement a virtual cube that can be scrambled and solved manually.
+- [ ] Add a timer for speedcubing practice.
+- [ ] Expand the algorithm library with more advanced methods.
+- [ ] Support different types of puzzles (e.g., 2x2, 4x4 cubes).
 
-## What technologies are used for this project?
+---
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/82ec14e3-6175-4465-81e7-ef143ea2990e) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+*This project was built to explore the intersection of modern web development, AI-driven computer vision, and algorithm visualization.*
