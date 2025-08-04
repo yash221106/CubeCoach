@@ -6,15 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { 
   Scan, 
-  Zap, 
-  Brain, 
-  Camera, 
   Play, 
-  ChevronRight,
-  Sparkles,
-  Cpu,
-  Eye,
-  Target
+  ChevronRight
 } from "lucide-react";
 
 const Index = () => {
@@ -35,24 +28,14 @@ const Index = () => {
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <nav className="p-6 lg:p-8 flex justify-between items-center">
+        <nav className="p-6 lg:p-8 flex justify-center items-center">
           <motion.div 
             className="text-2xl font-bold text-gradient-primary"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             Rubik's Cube Solver
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Badge variant="outline" className="neon-border">
-              <Cpu className="w-3 h-3 mr-1" />
-              Computer Vision
-            </Badge>
           </motion.div>
         </nav>
 
@@ -68,16 +51,7 @@ const Index = () => {
               className="space-y-8 lg:space-y-10 text-center lg:text-left"
             >
               <div className="space-y-6 lg:space-y-8">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                >
-                  <Badge className="bg-gradient-primary text-white px-4 py-2 text-sm">
-                    <Brain className="w-4 h-4 mr-2" />
-                    Smart Cube Solver
-                  </Badge>
-                </motion.div>
+
 
                 <motion.h1 
                   className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-black leading-tight"
@@ -86,7 +60,7 @@ const Index = () => {
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
                   <span className="text-foreground block">Solve Your</span>
-                  <span className="text-gradient-primary animate-glow block">
+                  <span className="text-gradient-primary block">
                     Rubik's Cube
                   </span>
                 </motion.h1>
@@ -170,77 +144,13 @@ const Index = () => {
                   </div>
                 </Card>
 
-                {/* Floating Status Cards */}
-                <motion.div
-                  className="absolute -top-4 -right-4 glass-card p-3 rounded-lg"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
-                >
-                  <div className="flex items-center gap-2 text-sm">
-                    <Eye className="w-4 h-4 text-accent" />
-                    <span>Color Detection</span>
-                  </div>
-                </motion.div>
 
-                <motion.div
-                  className="absolute -bottom-4 -left-4 glass-card p-3 rounded-lg"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 1.4 }}
-                >
-                  <div className="flex items-center gap-2 text-sm">
-                    <Target className="w-4 h-4 text-primary" />
-                    <span>Step Guide</span>
-                  </div>
-                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Features Section */}
-        <motion.div 
-          className="px-6 pb-12"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: Camera,
-                  title: "Computer Vision",
-                  description: "Advanced AI analyzes cube patterns instantly"
-                },
-                {
-                  icon: Zap,
-                  title: "Lightning Fast",
-                  description: "Get solutions in under 3 seconds"
-                },
-                {
-                  icon: Sparkles,
-                  title: "3D Visualization",
-                  description: "Interactive cube with step-by-step guidance"
-                }
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.2 + (index * 0.2) }}
-                >
-                  <Card className="glass-card p-6 hover-lift-3d group">
-                    <feature.icon className="w-10 h-10 text-primary mb-4 group-hover:scale-110 transition-transform duration-300" />
-                    <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+
       </div>
     </div>
   );

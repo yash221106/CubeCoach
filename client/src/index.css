@@ -151,6 +151,9 @@
     color: transparent;
     -webkit-text-fill-color: transparent;
     display: inline-block;
+    /* Remove any background artifacts */
+    background-size: 100% 100%;
+    background-attachment: scroll;
   }
 
   /* Neon Effects */
