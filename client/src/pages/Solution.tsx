@@ -139,7 +139,7 @@ const Solution = () => {
         <Card className="p-8 text-center">
           <h2 className="text-2xl font-semibold mb-4">No cube data found</h2>
           <p className="text-muted-foreground mb-6">Please scan your cube first.</p>
-          <Button onClick={() => navigate('/scanner')}>
+          <Button onClick={() => setLocation('/scanner')}>
             Go to Scanner
           </Button>
         </Card>
@@ -197,7 +197,7 @@ const Solution = () => {
                   Copy Solution to Clipboard
                 </Button>
                 <Button
-                  onClick={() => navigate('/scanner')}
+                  onClick={() => setLocation('/scanner')}
                   variant="outline"
                   className="w-full flex items-center gap-2"
                 >
@@ -205,7 +205,7 @@ const Solution = () => {
                   Scan Another Cube
                 </Button>
                 <Button
-                  onClick={() => navigate('/')}
+                  onClick={() => setLocation('/')}
                   variant="outline"
                   className="w-full flex items-center gap-2"
                 >

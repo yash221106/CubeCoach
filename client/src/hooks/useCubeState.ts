@@ -49,7 +49,7 @@ export const useCubeState = () => {
     });
   }, []);
 
-  const getFaceColors = useCallback((face: CubeFace, originalColors?: CubeColor[][]): CubeColor[][] => {
+  const getFaceColors = useCallback((face: CubeFace, originalColors?: CubeColor[][]): (CubeColor | null)[][] => {
     const edits = manualEdits[face];
     const base = originalColors || cubeState[face]?.colors || Array(3).fill(null).map(() => Array(3).fill(null));
     

@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { Box, Camera, Zap, Sparkles } from "lucide-react";
-import heroCube from "@/assets/hero-cube.jpg";
+import heroCube from "@/assets/hero-cube.svg";
 
 const Index = () => {
   const [, setLocation] = useLocation();

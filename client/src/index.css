@@ -104,6 +104,19 @@
 }
 
 @layer utilities {
+  /* Cube Colors */
+  .bg-cube-white { @apply bg-white border-gray-300; }
+  .bg-cube-yellow { @apply bg-yellow-400 border-yellow-500; }
+  .bg-cube-red { @apply bg-red-500 border-red-600; }
+  .bg-cube-orange { @apply bg-orange-500 border-orange-600; }
+  .bg-cube-blue { @apply bg-blue-500 border-blue-600; }
+  .bg-cube-green { @apply bg-green-500 border-green-600; }
+
+  /* Gradients */
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-cube { background: var(--gradient-cube); }
+
+  /* Animations */
   .animate-blur-in {
     animation: blurIn 0.5s ease-out;
   }
@@ -120,63 +133,98 @@
     animation: fadeIn 0.5s ease-out;
   }
 
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .animate-cube-rotate {
+    animation: cubeRotate 8s ease-in-out infinite;
+  }
+
+  /* Perspective and 3D */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  /* Shadows */
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-cube {
+    box-shadow: var(--shadow-cube);
+  }
+
   @keyframes blurIn {
     0% {
       backdrop-filter: blur(0px);
+      opacity: 0;
     }
     100% {
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(4px);
+      opacity: 1;
     }
   }
 
   @keyframes scaleFade {
     0% {
-      opacity: 1;
-      transform: scale(1);
+      transform: scale(0.95);
+      opacity: 0;
     }
     100% {
-      opacity: 0;
-      transform: scale(1.1);
+      transform: scale(1);
+      opacity: 1;
     }
   }
 
   @keyframes slideUp {
     0% {
-      opacity: 0;
       transform: translateY(20px);
+      opacity: 0;
     }
     100% {
-      opacity: 1;
       transform: translateY(0);
+      opacity: 1;
     }
   }
 
   @keyframes fadeIn {
     0% {
       opacity: 0;
-      transform: translateY(10px);
     }
     100% {
       opacity: 1;
-      transform: translateY(0);
     }
   }
 
-  .bg-blur {
-    backdrop-filter: blur(8px);
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: var(--shadow-glow);
+    }
+    50% {
+      box-shadow: 0 0 60px hsl(var(--primary) / 0.5);
+    }
   }
 
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .hover-lift {
-    transition: transform 0.3s ease;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-5px);
+  @keyframes cubeRotate {
+    0% {
+      transform: rotateX(-15deg) rotateY(-15deg);
+    }
+    25% {
+      transform: rotateX(-15deg) rotateY(75deg);
+    }
+    50% {
+      transform: rotateX(-15deg) rotateY(165deg);
+    }
+    75% {
+      transform: rotateX(-15deg) rotateY(255deg);
+    }
+    100% {
+      transform: rotateX(-15deg) rotateY(345deg);
+    }
   }
 }

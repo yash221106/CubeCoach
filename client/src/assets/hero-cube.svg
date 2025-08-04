@@ -1,0 +1,16 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="400" height="400" fill="#090909"/>
+<!-- Cube illustration -->
+<g transform="translate(100 100)">
+<rect x="30" y="30" width="140" height="140" fill="#ffffff" stroke="#333333" stroke-width="2"/>
+<rect x="50" y="50" width="40" height="40" fill="#ff0000"/>
+<rect x="100" y="50" width="40" height="40" fill="#00ff00"/>
+<rect x="150" y="50" width="40" height="40" fill="#0000ff"/>
+<rect x="50" y="100" width="40" height="40" fill="#ffff00"/>
+<rect x="100" y="100" width="40" height="40" fill="#ffffff"/>
+<rect x="150" y="100" width="40" height="40" fill="#ffa500"/>
+<rect x="50" y="150" width="40" height="40" fill="#ff0000"/>
+<rect x="100" y="150" width="40" height="40" fill="#00ff00"/>
+<rect x="150" y="150" width="40" height="40" fill="#0000ff"/>
+</g>
+</svg>
