@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { CubeViewer } from "@/components/CubeViewer";
 import { ImageCropper } from "@/components/ImageCropper";
 import { ColorGrid } from "@/components/ColorGrid";
@@ -18,7 +18,7 @@ export interface FaceData {
 }
 
 const Scanner = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   
   // Use custom hook for cube state management
@@ -151,7 +151,9 @@ const Scanner = () => {
   const allFacesScanned = getAllFacesScanned();
 
   const handleSolveCube = () => {
-    navigate('/solution', { state: { cubeData } });
+    // Store cube data in sessionStorage for wouter navigation
+    sessionStorage.setItem('cubeData', JSON.stringify(cubeData));
+    setLocation('/solution');
   };
 
   return (

@@ -5,12 +5,12 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Box, Camera, Zap, Sparkles } from "lucide-react";
 import heroCube from "@/assets/hero-cube.jpg";
 
 const Index = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { scrollY } = useScroll();
 
@@ -20,7 +20,7 @@ const Index = () => {
   const handleScanClick = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      navigate('/scanner');
+      setLocation('/scanner');
     }, 600);
   };
 

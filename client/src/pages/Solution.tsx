@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation as useRouterLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +15,17 @@ interface SolutionStep {
 
 
 const Solution = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [, setLocation] = useRouterLocation();
+  
+  // Get cube data from sessionStorage for wouter compatibility
+  const getCubeDataFromStorage = () => {
+    const stored = sessionStorage.getItem('cubeData');
+    return stored ? JSON.parse(stored) : null;
+  };
   const { toast } = useToast();
   const [isAnimating, setIsAnimating] = useState(false);
   
-  const cubeData = location.state?.cubeData;
+  const cubeData = getCubeDataFromStorage();
   const [solutionSteps, setSolutionSteps] = useState<SolutionStep[]>([]);
   const [isLoadingSolution, setIsLoadingSolution] = useState(false);
 
