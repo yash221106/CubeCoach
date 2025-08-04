@@ -197,12 +197,12 @@ const Scanner = () => {
         </Button>
         
         <div className="text-center">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Neural Cube Scanner
+          <h1 className="text-2xl font-bold text-gradient-primary">
+            Cube Scanner
           </h1>
           <Badge variant="outline" className="mt-2 neon-border">
             <Brain className="w-3 h-3 mr-1" />
-            AI Vision Active
+            Vision Active
           </Badge>
         </div>
         
