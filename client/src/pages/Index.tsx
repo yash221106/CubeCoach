@@ -35,14 +35,14 @@ const Index = () => {
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <nav className="p-6 flex justify-between items-center">
+        <nav className="p-6 lg:p-8 flex justify-between items-center">
           <motion.div 
             className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            CyberCube
+            Rubik's Cube Solver
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -51,23 +51,23 @@ const Index = () => {
           >
             <Badge variant="outline" className="neon-border">
               <Cpu className="w-3 h-3 mr-1" />
-              AI Powered
+              Computer Vision
             </Badge>
           </motion.div>
         </nav>
 
         {/* Hero Section */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-16 lg:py-20">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="space-y-6 lg:space-y-8"
+              className="space-y-8 lg:space-y-10 text-center lg:text-left"
             >
-              <div className="space-y-4 lg:space-y-6">
+              <div className="space-y-6 lg:space-y-8">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -75,7 +75,7 @@ const Index = () => {
                 >
                   <Badge className="bg-gradient-primary text-white px-4 py-2 text-sm">
                     <Brain className="w-4 h-4 mr-2" />
-                    Neural Network Solver
+                    Smart Cube Solver
                   </Badge>
                 </motion.div>
 
@@ -97,8 +97,8 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                  Advanced AI-powered computer vision analyzes your cube in seconds. 
-                  Get step-by-step solutions with interactive 3D visualization.
+                  Upload photos of your cube faces and get step-by-step solving instructions. 
+                  Features color detection and interactive 3D visualization.
                 </motion.p>
               </div>
 
@@ -147,14 +147,14 @@ const Index = () => {
                     
                     {/* 3D Cube Representation */}
                     <div className="transform-3d animate-float">
-                      <div className="grid grid-cols-3 gap-1 p-6">
-                        {/* Simulate cube face */}
+                      <div className="grid grid-cols-3 gap-2 p-8">
+                        {/* Simulate cube face - Bigger squares */}
                         {Array.from({ length: 9 }).map((_, i) => (
                           <motion.div
                             key={i}
-                            className={`w-8 h-8 rounded border-2 ${
-                              i === 4 ? 'bg-cube-red' : 
-                              i % 2 === 0 ? 'bg-cube-blue' : 'bg-cube-yellow'
+                            className={`w-16 h-16 rounded border-2 ${
+                              i === 4 ? 'bg-cube-red border-red-400' : 
+                              i % 2 === 0 ? 'bg-cube-blue border-blue-400' : 'bg-cube-yellow border-yellow-400'
                             }`}
                             initial={{ scale: 0, rotate: 180 }}
                             animate={{ scale: 1, rotate: 0 }}
@@ -179,7 +179,7 @@ const Index = () => {
                 >
                   <div className="flex items-center gap-2 text-sm">
                     <Eye className="w-4 h-4 text-accent" />
-                    <span>AI Vision</span>
+                    <span>Color Detection</span>
                   </div>
                 </motion.div>
 
@@ -191,7 +191,7 @@ const Index = () => {
                 >
                   <div className="flex items-center gap-2 text-sm">
                     <Target className="w-4 h-4 text-primary" />
-                    <span>99.9% Accuracy</span>
+                    <span>Step Guide</span>
                   </div>
                 </motion.div>
               </div>

@@ -244,7 +244,7 @@ const Solution = () => {
         
         <div className="text-center">
           <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Neural Solution Engine
+            Solution Generator
           </h1>
           <Badge variant="outline" className="mt-2 neon-border">
             <Trophy className="w-3 h-3 mr-1" />
@@ -443,8 +443,8 @@ const Solution = () => {
                   <div className="text-xs text-muted-foreground">Est. Time</div>
                 </div>
                 <div className="p-3 bg-success/10 rounded-lg">
-                  <div className="text-2xl font-bold text-success">99.9%</div>
-                  <div className="text-xs text-muted-foreground">Success Rate</div>
+                  <div className="text-2xl font-bold text-success">Easy</div>
+                  <div className="text-xs text-muted-foreground">Difficulty</div>
                 </div>
               </div>
             </Card>
