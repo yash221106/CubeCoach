@@ -57,17 +57,17 @@ const Index = () => {
         </nav>
 
         {/* Hero Section */}
-        <div className="flex-1 flex items-center justify-center px-6">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="space-y-8"
+              className="space-y-6 lg:space-y-8"
             >
-              <div className="space-y-6">
+              <div className="space-y-4 lg:space-y-6">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -80,20 +80,19 @@ const Index = () => {
                 </motion.div>
 
                 <motion.h1 
-                  className="text-6xl lg:text-8xl font-black leading-tight"
+                  className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-black leading-tight"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
-                  <span className="text-foreground">Solve Your</span>
-                  <br />
-                  <span className="bg-gradient-primary bg-clip-text text-transparent animate-glow">
+                  <span className="text-foreground block">Solve Your</span>
+                  <span className="bg-gradient-primary bg-clip-text text-transparent animate-glow block">
                     Rubik's Cube
                   </span>
                 </motion.h1>
 
                 <motion.p 
-                  className="text-xl text-muted-foreground leading-relaxed max-w-lg"
+                  className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-lg"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}

@@ -308,8 +308,13 @@ const Scanner = () => {
                       />
                     )}
                     <ImageCropper
-                      src={uploadedImage}
-                      onCropComplete={handleCropComplete}
+                      image={uploadedImage}
+                      onCropConfirm={handleCropComplete}
+                      onCancel={() => {
+                        setUploadedImage(null);
+                        setCroppedImage(null);
+                      }}
+                      isProcessing={isProcessing}
                     />
                   </div>
                 </div>
@@ -338,33 +343,25 @@ const Scanner = () => {
                       {detectedColors && (
                         <ColorGrid
                           colors={detectedColors}
-                          onColorsChange={setDetectedColors}
-                          face={selectedFace}
-                        />
-                      )}
-                      
-                      <div className="flex gap-3">
-                        <Button 
-                          onClick={handleConfirmColors}
-                          className="flex-1 bg-gradient-primary hover:scale-105 transition-all duration-300"
-                          disabled={isProcessing}
-                        >
-                          <Check className="w-4 h-4 mr-2" />
-                          Confirm Colors
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          onClick={() => {
+                          onConfirm={handleConfirmColors}
+                          onRescan={() => {
                             setUploadedImage(null);
                             setCroppedImage(null);
                             setShowColorGrid(false);
                             setDetectedColors(null);
                           }}
-                          className="glass-card"
-                        >
-                          Retake
-                        </Button>
-                      </div>
+                          onColorEdit={(row, col, color) => {
+                            const newColors = detectedColors.map((colorRow, rowIndex) =>
+                              colorRow.map((cell, colIndex) =>
+                                rowIndex === row && colIndex === col ? color : cell
+                              )
+                            );
+                            setDetectedColors(newColors);
+                          }}
+                        />
+                      )}
+                      
+
                     </motion.div>
                   )}
                 </AnimatePresence>
