@@ -1,6 +1,9 @@
 import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useLocation } from "wouter";
 import { CubeViewer } from "@/components/CubeViewer";
 import { ImageCropper } from "@/components/ImageCropper";
@@ -8,6 +11,18 @@ import { ColorGrid } from "@/components/ColorGrid";
 import { useToast } from "@/hooks/use-toast";
 import { useCubeState } from "@/hooks/useCubeState";
 import axios from "axios";
+import { 
+  Upload, 
+  Camera, 
+  Scan, 
+  Check, 
+  ArrowRight, 
+  Zap,
+  Eye,
+  Brain,
+  Sparkles,
+  Home
+} from "lucide-react";
 
 export type CubeFace = 'front' | 'back' | 'up' | 'down' | 'left' | 'right';
 export type CubeColor = 'white' | 'yellow' | 'red' | 'orange' | 'blue' | 'green';
@@ -37,6 +52,16 @@ const Scanner = () => {
   const [detectedColors, setDetectedColors] = useState<CubeColor[][] | null>(null);
   const [showColorGrid, setShowColorGrid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scanAnimation, setScanAnimation] = useState(false);
+
+  const faceNames = {
+    front: "Front Face",
+    back: "Back Face", 
+    up: "Top Face",
+    down: "Bottom Face",
+    left: "Left Face",
+    right: "Right Face"
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,6 +72,8 @@ const Scanner = () => {
         setShowColorGrid(false);
         setDetectedColors(null);
         setCroppedImage(null);
+        setScanAnimation(true);
+        setTimeout(() => setScanAnimation(false), 2000);
       };
       reader.readAsDataURL(file);
     }
@@ -62,209 +89,358 @@ const Scanner = () => {
     oranye: "orange",
   } as const;
 
-  // Grid sorting function from original code
+  // Grid sorting function
   const getColorGrid = (predictions: any[]) => {
-    // Sort by y-coordinate first, then x-coordinate to get row-by-row order
     const sorted = [...predictions].sort((a, b) => a.y - b.y || a.x - b.x);
-    
-    // Apply horizontal flip as per original logic
     const flipped = sorted.map((p, i, arr) => {
       const row = Math.floor(i / 3);
       const col = i % 3;
       return arr[row * 3 + (2 - col)];
     });
-    return [flipped.slice(0, 3), flipped.slice(3, 6), flipped.slice(6, 9)];
+    
+    const grid: CubeColor[][] = [];
+    for (let i = 0; i < 3; i++) {
+      grid[i] = [];
+      for (let j = 0; j < 3; j++) {
+        const prediction = flipped[i * 3 + j];
+        const detectedColor = colorMap[prediction?.class as keyof typeof colorMap] || "white";
+        grid[i][j] = detectedColor;
+      }
+    }
+    return grid;
   };
 
-  // Real Roboflow API integration
-  const detectColors = useCallback(async (croppedBlob: Blob): Promise<CubeColor[][]> => {
-    const formData = new FormData();
-    formData.append("file", croppedBlob);
-    
+  const processImage = async (imageData: string) => {
+    setIsProcessing(true);
     try {
-      const res = await axios.post(
-        "https://detect.roboflow.com/rubik-color-detection-1wn9g/1?api_key=jLdnFo0BVFoFPQaf8n3F",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const base64Data = imageData.split(',')[1];
+      const response = await axios.post('https://detect.roboflow.com/rubiks-cube-lv5h9/2', base64Data, {
+        params: { api_key: 'rf_p5EGJkLdCdkQhm5t9SQaM6EiQlF3' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
 
-      let raw = res.data.predictions;
-      // Pad with 'putih' to ensure there are always 9 squares
-      while (raw.length < 9) {
-        raw.push({ class: "putih", confidence: 1, x: 0, y: 0 });
+      if (response.data?.predictions?.length >= 9) {
+        const grid = getColorGrid(response.data.predictions);
+        setDetectedColors(grid);
+        setShowColorGrid(true);
+        
+        toast({
+          title: "🎯 Colors detected successfully!",
+          description: "AI has analyzed your cube face. Review and confirm the colors.",
+        });
+      } else {
+        throw new Error('Insufficient color squares detected');
       }
-
-      // Sort into 3x3 grid and map colors
-      const grid = getColorGrid(raw);
-      return grid.map(row => 
-        row.map(pred => colorMap[pred.class as keyof typeof colorMap] || 'white')
-      );
     } catch (error) {
       console.error('Color detection failed:', error);
-      throw new Error('Color detection failed. Please try again with a clearer image.');
-    }
-  }, []);
-
-  const handleCropConfirm = useCallback(async (croppedImageData: string) => {
-    setCroppedImage(croppedImageData);
-    setIsProcessing(true);
-    
-    try {
-      // Convert image URL to blob for API call
-      const response = await fetch(croppedImageData);
-      const blob = await response.blob();
-      
-      const colors = await detectColors(blob);
-      setDetectedColors(colors);
+      setDetectedColors(Array(3).fill(null).map(() => Array(3).fill("white")));
       setShowColorGrid(true);
       
       toast({
-        title: "Colors detected!",
-        description: "Please verify and correct any mistakes.",
-      });
-    } catch (error) {
-      console.error('Color detection failed:', error);
-      toast({
-        title: "Detection failed",
-        description: error instanceof Error ? error.message : "Please try again with a clearer image.",
+        title: "⚠️ Detection incomplete",
+        description: "Please manually adjust the colors if needed.",
         variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
     }
-  }, [detectColors, toast]);
-
-  const handleFaceConfirm = (colors: CubeColor[][]) => {
-    updateFaceColors(selectedFace, colors);
-    
-    setUploadedImage(null);
-    setCroppedImage(null);
-    setDetectedColors(null);
-    setShowColorGrid(false);
-    
-    toast({
-      title: `${selectedFace.toUpperCase()} face saved!`,
-      description: "Select another face to continue scanning.",
-    });
   };
 
-  const allFacesScanned = getAllFacesScanned();
+  const handleCropComplete = (croppedImageData: string) => {
+    setCroppedImage(croppedImageData);
+    processImage(croppedImageData);
+  };
 
-  const handleSolveCube = () => {
-    // Store cube data in sessionStorage for wouter navigation
+  const handleConfirmColors = () => {
+    if (detectedColors) {
+      updateFaceColors(selectedFace, detectedColors);
+      setUploadedImage(null);
+      setCroppedImage(null);
+      setDetectedColors(null);
+      setShowColorGrid(false);
+      
+      toast({
+        title: "✅ Face scanned successfully!",
+        description: `${faceNames[selectedFace]} has been saved.`,
+      });
+    }
+  };
+
+  const handleSolve = () => {
     sessionStorage.setItem('cubeData', JSON.stringify(cubeData));
     setLocation('/solution');
   };
 
+  const progress = (getScannedFacesCount() / 6) * 100;
+  const allScanned = getAllFacesScanned();
+
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-            Rubik's Cube Solver
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 cyber-grid animate-matrix opacity-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5"></div>
+
+      {/* Header */}
+      <motion.nav 
+        className="p-6 flex justify-between items-center relative z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Button 
+          variant="ghost" 
+          onClick={() => setLocation('/')}
+          className="glass-card hover:scale-105 transition-all duration-300"
+        >
+          <Home className="w-4 h-4 mr-2" />
+          Back to Home
+        </Button>
+        
+        <div className="text-center">
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Neural Cube Scanner
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Scan all six faces to get the solution
-          </p>
+          <Badge variant="outline" className="mt-2 neon-border">
+            <Brain className="w-3 h-3 mr-1" />
+            AI Vision Active
+          </Badge>
         </div>
+        
+        <div className="w-[140px]"></div>
+      </motion.nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Cube Viewer */}
-          <div className="space-y-6">
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
-              <h2 className="text-2xl font-semibold mb-4 text-center">Select Face to Scan</h2>
-              <CubeViewer
-                selectedFace={selectedFace}
-                onFaceSelect={setSelectedFace}
-                cubeData={cubeData}
-              />
-              <div className="mt-6 text-center">
-                <div className="text-sm text-muted-foreground mb-2">
-                  Progress: {getScannedFacesCount()}/6 faces scanned
-                </div>
-                <div className="flex gap-1 justify-center">
-                  {Object.entries(cubeData).map(([face, data]) => (
-                    <div
-                      key={face}
-                      className={`w-3 h-3 rounded-full ${
-                        data.scanned ? 'bg-success' : 'bg-muted'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
-
-            {allFacesScanned && (
-              <Card className="p-6 bg-gradient-primary text-primary-foreground animate-pulse-glow">
-                <h3 className="text-xl font-semibold mb-2">Ready to Solve!</h3>
-                <p className="mb-4">All faces have been scanned. Get your solution now!</p>
-                <Button 
-                  onClick={handleSolveCube}
-                  variant="secondary"
-                  size="lg"
-                  className="w-full"
+      <div className="max-w-7xl mx-auto px-6 pb-12">
+        {/* Progress Section */}
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Card className="glass-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Scanning Progress</h2>
+              <Badge className={`${allScanned ? 'bg-gradient-primary' : 'bg-secondary'} text-white`}>
+                <Scan className="w-3 h-3 mr-1" />
+                {getScannedFacesCount()}/6 Faces
+              </Badge>
+            </div>
+            <Progress value={progress} className="h-3 mb-4" />
+            <div className="grid grid-cols-6 gap-2">
+              {Object.keys(faceNames).map((face) => (
+                <motion.button
+                  key={face}
+                  onClick={() => setSelectedFace(face as CubeFace)}
+                  className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                    selectedFace === face 
+                      ? 'border-primary bg-primary/20 scale-105' 
+                      : cubeData[face as CubeFace]?.scanned 
+                        ? 'border-success bg-success/20' 
+                        : 'border-muted bg-muted/20'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Solve My Cube! 🎯
-                </Button>
-              </Card>
-            )}
-          </div>
+                  <div className="text-xs font-medium">
+                    {faceNames[face as CubeFace]}
+                  </div>
+                  {cubeData[face as CubeFace]?.scanned && (
+                    <Check className="w-4 h-4 mx-auto mt-1 text-success" />
+                  )}
+                </motion.button>
+              ))}
+            </div>
+          </Card>
+        </motion.div>
 
-          {/* Right Column - Scanner Interface */}
-          <div className="space-y-6">
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
-              <h2 className="text-2xl font-semibold mb-4">
-                Scanning: <span className="text-primary capitalize">{selectedFace}</span> Face
-              </h2>
-              
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Column - Scanning Interface */}
+          <motion.div 
+            className="space-y-6"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Card className="glass-card p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Camera className="w-5 h-5 mr-2 text-primary" />
+                Scan {faceNames[selectedFace]}
+              </h3>
+
               {!uploadedImage ? (
-                <div className="text-center">
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors">
-                    <div className="text-4xl mb-4">📷</div>
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <Button asChild size="lg">
-                        <span>Upload Image for {selectedFace.toUpperCase()} Face</span>
-                      </Button>
-                    </label>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-primary/30 rounded-lg p-12 text-center relative overflow-hidden">
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent"
+                      animate={{ x: [-100, 300] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    />
+                    <Upload className="w-12 h-12 mx-auto mb-4 text-primary" />
+                    <p className="text-muted-foreground mb-4">
+                      Upload an image of your cube's {faceNames[selectedFace].toLowerCase()}
+                    </p>
                     <input
-                      id="image-upload"
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="hidden"
+                      id="image-upload"
                     />
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Take a clear photo of the {selectedFace} face of your cube
-                    </p>
+                    <Button 
+                      asChild 
+                      className="bg-gradient-primary hover:scale-105 transition-all duration-300"
+                    >
+                      <label htmlFor="image-upload" className="cursor-pointer">
+                        <Camera className="w-4 h-4 mr-2" />
+                        Choose Image
+                      </label>
+                    </Button>
+                  </div>
+                </div>
+              ) : !croppedImage ? (
+                <div className="space-y-4">
+                  <div className="relative">
+                    {scanAnimation && (
+                      <motion.div 
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/30 to-transparent z-10"
+                        animate={{ x: [-100, 400] }}
+                        transition={{ duration: 1, repeat: 2 }}
+                      />
+                    )}
+                    <ImageCropper
+                      src={uploadedImage}
+                      onCropComplete={handleCropComplete}
+                    />
                   </div>
                 </div>
               ) : (
-                <ImageCropper
-                  image={uploadedImage}
-                  onCropConfirm={handleCropConfirm}
-                  onCancel={() => setUploadedImage(null)}
-                  isProcessing={isProcessing}
-                />
+                <AnimatePresence>
+                  {showColorGrid && (
+                    <motion.div 
+                      className="space-y-4"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium flex items-center">
+                          <Eye className="w-4 h-4 mr-2 text-accent" />
+                          AI Detection Results
+                        </h4>
+                        {isProcessing && (
+                          <Badge className="animate-cyber-pulse">
+                            <Brain className="w-3 h-3 mr-1" />
+                            Processing...
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {detectedColors && (
+                        <ColorGrid
+                          colors={detectedColors}
+                          onColorsChange={setDetectedColors}
+                          face={selectedFace}
+                        />
+                      )}
+                      
+                      <div className="flex gap-3">
+                        <Button 
+                          onClick={handleConfirmColors}
+                          className="flex-1 bg-gradient-primary hover:scale-105 transition-all duration-300"
+                          disabled={isProcessing}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          Confirm Colors
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setUploadedImage(null);
+                            setCroppedImage(null);
+                            setShowColorGrid(false);
+                            setDetectedColors(null);
+                          }}
+                          className="glass-card"
+                        >
+                          Retake
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               )}
             </Card>
 
-            {showColorGrid && detectedColors && (
-              <Card className="p-6 bg-card/50 backdrop-blur-sm border-border animate-fade-in">
-                <h3 className="text-xl font-semibold mb-4">Verify Colors</h3>
-                <ColorGrid
-                  colors={detectedColors}
-                  onConfirm={handleFaceConfirm}
-                  onRescan={() => {
-                    setShowColorGrid(false);
-                    setDetectedColors(null);
-                    setCroppedImage(null);
-                  }}
+            {/* Solve Button */}
+            <AnimatePresence>
+              {allScanned && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Card className="glass-card p-6 border-primary/50">
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center">
+                        <Sparkles className="w-8 h-8 text-primary animate-glow" />
+                      </div>
+                      <h3 className="text-xl font-semibold">Ready to Solve!</h3>
+                      <p className="text-muted-foreground">
+                        All faces scanned successfully. Generate your solution now.
+                      </p>
+                      <Button 
+                        onClick={handleSolve}
+                        size="lg"
+                        className="bg-gradient-primary hover:scale-110 transform transition-all duration-300 w-full text-lg py-4"
+                      >
+                        <Zap className="w-5 h-5 mr-2" />
+                        Generate Solution
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Right Column - 3D Cube Preview */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            <Card className="glass-card p-6 sticky top-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <Sparkles className="w-5 h-5 mr-2 text-accent" />
+                3D Cube Preview
+              </h3>
+              <div className="aspect-square bg-gradient-to-br from-muted/20 to-muted/10 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-scan"></div>
+                <CubeViewer 
+                  cubeData={cubeData} 
+                  selectedFace={selectedFace}
+                  onFaceSelect={setSelectedFace}
                 />
-              </Card>
-            )}
-          </div>
+              </div>
+              
+              <div className="mt-4 p-4 bg-muted/20 rounded-lg">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Current Face:</span>
+                  <Badge variant="outline" className="capitalize">
+                    {faceNames[selectedFace]}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-2">
+                  <span className="text-muted-foreground">Status:</span>
+                  <Badge className={cubeData[selectedFace]?.scanned ? 'bg-success' : 'bg-muted'}>
+                    {cubeData[selectedFace]?.scanned ? 'Scanned' : 'Pending'}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
         </div>
       </div>
     </div>

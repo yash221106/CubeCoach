@@ -6,48 +6,49 @@
 
 @layer base {
   :root {
-    /* Rubik's Cube themed dark design system */
-    --background: 220 15% 8%;
-    --foreground: 210 20% 98%;
+    /* Modern Futuristic Dark Theme */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 98%;
 
-    --card: 220 15% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 220 15% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 220 15% 8%;
+    --primary: 271 91% 65%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 210 10% 65%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 280 100% 60%;
-    --accent-foreground: 220 15% 8%;
+    --accent: 180 100% 50%;
+    --accent-foreground: 0 0% 3%;
 
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 18%;
-    --ring: 210 100% 50%;
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 271 91% 65%;
 
-    --success: 120 60% 50%;
-    --warning: 45 100% 60%;
+    --success: 120 70% 50%;
+    --warning: 45 90% 60%;
 
-    /* Rubik's Cube colors */
-    --cube-white: 0 0% 98%;
-    --cube-yellow: 55 100% 55%;
-    --cube-red: 0 85% 55%;
-    --cube-orange: 25 100% 55%;
-    --cube-blue: 220 85% 55%;
-    --cube-green: 120 60% 45%;
+    /* Neon Cube colors */
+    --cube-white: 0 0% 95%;
+    --cube-yellow: 55 100% 60%;
+    --cube-red: 0 100% 60%;
+    --cube-orange: 25 100% 60%;
+    --cube-blue: 220 100% 60%;
+    --cube-green: 120 70% 50%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(271 91% 65%), hsl(180 100% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 12%), hsl(0 0% 20%));
     --gradient-cube: linear-gradient(135deg, 
       hsl(var(--cube-red)), 
       hsl(var(--cube-orange)), 
@@ -56,11 +57,12 @@
       hsl(var(--cube-blue))
     );
 
-    /* Shadows */
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
-    --shadow-cube: 0 20px 40px -10px hsl(var(--primary) / 0.2);
+    /* Neon Shadows */
+    --shadow-neon: 0 0 50px hsl(271 91% 65% / 0.5);
+    --shadow-cyan: 0 0 30px hsl(180 100% 50% / 0.4);
+    --shadow-deep: 0 25px 50px -15px hsl(0 0% 0% / 0.8);
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -104,127 +106,163 @@
 }
 
 @layer utilities {
-  /* Cube Colors */
-  .bg-cube-white { @apply bg-white border-gray-300; }
-  .bg-cube-yellow { @apply bg-yellow-400 border-yellow-500; }
-  .bg-cube-red { @apply bg-red-500 border-red-600; }
-  .bg-cube-orange { @apply bg-orange-500 border-orange-600; }
-  .bg-cube-blue { @apply bg-blue-500 border-blue-600; }
-  .bg-cube-green { @apply bg-green-500 border-green-600; }
+  /* Neon Cube Colors */
+  .bg-cube-white { 
+    background: hsl(var(--cube-white));
+    border-color: hsl(var(--cube-white) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-white) / 0.3);
+  }
+  .bg-cube-yellow { 
+    background: hsl(var(--cube-yellow));
+    border-color: hsl(var(--cube-yellow) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-yellow) / 0.3);
+  }
+  .bg-cube-red { 
+    background: hsl(var(--cube-red));
+    border-color: hsl(var(--cube-red) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-red) / 0.3);
+  }
+  .bg-cube-orange { 
+    background: hsl(var(--cube-orange));
+    border-color: hsl(var(--cube-orange) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-orange) / 0.3);
+  }
+  .bg-cube-blue { 
+    background: hsl(var(--cube-blue));
+    border-color: hsl(var(--cube-blue) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-blue) / 0.3);
+  }
+  .bg-cube-green { 
+    background: hsl(var(--cube-green));
+    border-color: hsl(var(--cube-green) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--cube-green) / 0.3);
+  }
 
-  /* Gradients */
+  /* Modern Gradients */
   .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-secondary { background: var(--gradient-secondary); }
   .bg-gradient-cube { background: var(--gradient-cube); }
 
+  /* Neon Effects */
+  .neon-border {
+    border: 1px solid hsl(var(--primary));
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
   /* Animations */
-  .animate-blur-in {
-    animation: blurIn 0.5s ease-out;
-  }
-  
-  .animate-scale-fade {
-    animation: scaleFade 0.6s ease-out;
-  }
-  
-  .animate-slide-up {
-    animation: slideUp 0.5s ease-out;
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
   }
 
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
   }
 
-  .animate-pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
+  .animate-scan {
+    animation: scan 2s linear infinite;
   }
 
-  .animate-cube-rotate {
-    animation: cubeRotate 8s ease-in-out infinite;
+  .animate-matrix {
+    animation: matrix 20s linear infinite;
   }
 
-  /* Perspective and 3D */
-  .perspective-1000 {
+  .animate-cyber-pulse {
+    animation: cyberPulse 1.5s ease-in-out infinite;
+  }
+
+  /* 3D Effects */
+  .transform-3d {
+    transform-style: preserve-3d;
     perspective: 1000px;
   }
 
-  .transform-style-preserve-3d {
-    transform-style: preserve-3d;
+  .hover-lift-3d {
+    transition: transform 0.3s ease;
   }
 
-  /* Shadows */
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
+  .hover-lift-3d:hover {
+    transform: translateY(-10px) rotateX(5deg);
   }
 
-  .shadow-cube {
-    box-shadow: var(--shadow-cube);
-  }
-
-  @keyframes blurIn {
+  @keyframes glow {
     0% {
-      backdrop-filter: blur(0px);
-      opacity: 0;
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
     }
     100% {
-      backdrop-filter: blur(4px);
-      opacity: 1;
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
     }
   }
 
-  @keyframes scaleFade {
-    0% {
-      transform: scale(0.95);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideUp {
-    0% {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes pulseGlow {
+  @keyframes float {
     0%, 100% {
-      box-shadow: var(--shadow-glow);
+      transform: translateY(0px);
     }
     50% {
-      box-shadow: 0 0 60px hsl(var(--primary) / 0.5);
+      transform: translateY(-20px);
     }
   }
 
-  @keyframes cubeRotate {
+  @keyframes scan {
     0% {
-      transform: rotateX(-15deg) rotateY(-15deg);
-    }
-    25% {
-      transform: rotateX(-15deg) rotateY(75deg);
-    }
-    50% {
-      transform: rotateX(-15deg) rotateY(165deg);
-    }
-    75% {
-      transform: rotateX(-15deg) rotateY(255deg);
+      transform: translateX(-100%);
     }
     100% {
-      transform: rotateX(-15deg) rotateY(345deg);
+      transform: translateX(200%);
+    }
+  }
+
+  @keyframes matrix {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 20px 20px;
+    }
+  }
+
+  @keyframes cyberPulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 }

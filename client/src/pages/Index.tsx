@@ -1,211 +1,246 @@
-// src/pages/index.tsx
-
 import { useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Box, Camera, Zap, Sparkles } from "lucide-react";
-import heroCube from "@/assets/hero-cube.svg";
+import { 
+  Scan, 
+  Zap, 
+  Brain, 
+  Camera, 
+  Play, 
+  ChevronRight,
+  Sparkles,
+  Cpu,
+  Eye,
+  Target
+} from "lucide-react";
 
 const Index = () => {
   const [, setLocation] = useLocation();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const { scrollY } = useScroll();
-
-  const backgroundOpacity = useTransform(scrollY, [0, 300], [0.2, 0.1]);
-  const backgroundBlur = useTransform(scrollY, [0, 300], [2, 6]);
-
-  const handleScanClick = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setLocation('/scanner');
-    }, 600);
-  };
+  const [isHovering, setIsHovering] = useState(false);
 
   return (
-    <div className={`min-h-screen bg-background ${
-      isTransitioning ? 'animate-scale-fade' : ''
-    }`}>
-      {/* Hero Section */}
-      <div className="relative overflow-hidden min-h-screen flex items-center">
-        <motion.div 
-          className="absolute inset-0 bg-gradient-cube opacity-10"
-          style={{ opacity: backgroundOpacity }}
-        />
-        <motion.div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ 
-            backgroundImage: `url(${heroCube})`,
-            filter: `blur(${backgroundBlur}px)`
-          }}
-        />
-        <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px]"></div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 cyber-grid animate-matrix opacity-20"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10"></div>
+      
+      {/* Floating Orbs */}
+      <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 rounded-full blur-xl animate-float"></div>
+      <div className="absolute bottom-20 right-20 w-48 h-48 bg-accent/20 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-destructive/20 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
 
-        <div className="relative z-10 container mx-auto px-4 py-20 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="mb-6">
-              <motion.div
-                initial={{ y: 0 }}
-                animate={{ y: [-10, 0, -10] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <Badge variant="secondary" className="mb-4 px-4 py-2">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  AI-Powered Solver
-                </Badge>
-              </motion.div>
-            </div>
-
-            <motion.h1 
-              className="text-5xl md:text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Rubik's Cube
-              <br />
-              Solver
-            </motion.h1>
-
-            <motion.p 
-              className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              Scan your scrambled cube with your camera and get step-by-step solving instructions in seconds
-            </motion.p>
-
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <Button
-                onClick={handleScanClick}
-                size="lg"
-                className="bg-gradient-primary text-lg px-8 py-6 shadow-glow hover:shadow-cube transition-all duration-300"
-              >
-                <Camera className="w-5 h-5 mr-2" />
-                Start Scanning
-              </Button>
-
-              <Button
-                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6"
-              >
-                Learn More
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="container mx-auto px-4 py-20">
-        <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          How It Works
-        </motion.h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <motion.div
+      {/* Main Content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Header */}
+        <nav className="p-6 flex justify-between items-center">
+          <motion.div 
+            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
             initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Card className="p-8 bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Camera className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">1. Scan Your Cube</h3>
-                <p className="text-muted-foreground">
-                  Upload photos of all six faces using our intelligent cropping tool. Our AI detects colors automatically.
-                </p>
-              </div>
-            </Card>
+            CyberCube
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Card className="p-8 bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Box className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">2. Verify Colors</h3>
-                <p className="text-muted-foreground">
-                  Review detected colors and make corrections if needed. Click any square to change its color.
-                </p>
-              </div>
-            </Card>
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card className="p-8 bg-card/50 backdrop-blur-sm border-border hover:shadow-glow transition-all duration-300">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Zap className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">3. Get Solution</h3>
-                <p className="text-muted-foreground">
-                  Receive step-by-step solving instructions with clear notation and optional 3D animation.
-                </p>
-              </div>
-            </Card>
+            <Badge variant="outline" className="neon-border">
+              <Cpu className="w-3 h-3 mr-1" />
+              AI Powered
+            </Badge>
           </motion.div>
-        </div>
-      </div>
+        </nav>
 
-      {/* CTA Section */}
-      <div className="bg-gradient-primary text-primary-foreground py-20">
+        {/* Hero Section */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  <Badge className="bg-gradient-primary text-white px-4 py-2 text-sm">
+                    <Brain className="w-4 h-4 mr-2" />
+                    Neural Network Solver
+                  </Badge>
+                </motion.div>
+
+                <motion.h1 
+                  className="text-6xl lg:text-8xl font-black leading-tight"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <span className="text-foreground">Solve Your</span>
+                  <br />
+                  <span className="bg-gradient-primary bg-clip-text text-transparent animate-glow">
+                    Rubik's Cube
+                  </span>
+                </motion.h1>
+
+                <motion.p 
+                  className="text-xl text-muted-foreground leading-relaxed max-w-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                >
+                  Advanced AI-powered computer vision analyzes your cube in seconds. 
+                  Get step-by-step solutions with interactive 3D visualization.
+                </motion.p>
+              </div>
+
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+              >
+                <Button
+                  size="lg"
+                  className="bg-gradient-primary hover:scale-105 transform transition-all duration-300 text-lg px-8 py-4 h-auto group"
+                  onClick={() => setLocation('/scanner')}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={() => setIsHovering(false)}
+                >
+                  <Scan className={`w-5 h-5 mr-3 transition-all duration-300 ${isHovering ? 'animate-cyber-pulse' : ''}`} />
+                  Start Scanning
+                  <ChevronRight className={`w-5 h-5 ml-2 transition-transform duration-300 ${isHovering ? 'translate-x-1' : ''}`} />
+                </Button>
+                
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="glass-card hover:scale-105 transform transition-all duration-300 text-lg px-8 py-4 h-auto"
+                >
+                  <Play className="w-5 h-5 mr-3" />
+                  Watch Demo
+                </Button>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Content - 3D Cube Visualization */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="relative"
+            >
+              <div className="relative w-full max-w-lg mx-auto">
+                {/* Main Cube Card */}
+                <Card className="glass-card p-8 hover-lift-3d">
+                  <div className="aspect-square bg-gradient-to-br from-muted/50 to-muted/20 rounded-lg flex items-center justify-center relative overflow-hidden">
+                    {/* Scan Line Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-scan"></div>
+                    
+                    {/* 3D Cube Representation */}
+                    <div className="transform-3d animate-float">
+                      <div className="grid grid-cols-3 gap-1 p-6">
+                        {/* Simulate cube face */}
+                        {Array.from({ length: 9 }).map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className={`w-8 h-8 rounded border-2 ${
+                              i === 4 ? 'bg-cube-red' : 
+                              i % 2 === 0 ? 'bg-cube-blue' : 'bg-cube-yellow'
+                            }`}
+                            initial={{ scale: 0, rotate: 180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ 
+                              duration: 0.6, 
+                              delay: 0.8 + (i * 0.1),
+                              type: "spring"
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Floating Status Cards */}
+                <motion.div
+                  className="absolute -top-4 -right-4 glass-card p-3 rounded-lg"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 1.2 }}
+                >
+                  <div className="flex items-center gap-2 text-sm">
+                    <Eye className="w-4 h-4 text-accent" />
+                    <span>AI Vision</span>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-4 -left-4 glass-card p-3 rounded-lg"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 1.4 }}
+                >
+                  <div className="flex items-center gap-2 text-sm">
+                    <Target className="w-4 h-4 text-primary" />
+                    <span>99.9% Accuracy</span>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Features Section */}
         <motion.div 
-          className="container mx-auto px-4 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          className="px-6 pb-12"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Solve Your Cube?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of cubers who've solved their puzzles with our AI-powered tool
-          </p>
-          <Button
-            onClick={handleScanClick}
-            size="lg"
-            variant="secondary"
-            className="text-lg px-8 py-6"
-          >
-            <Camera className="w-5 h-5 mr-2" />
-            Start Solving Now
-          </Button>
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Camera,
+                  title: "Computer Vision",
+                  description: "Advanced AI analyzes cube patterns instantly"
+                },
+                {
+                  icon: Zap,
+                  title: "Lightning Fast",
+                  description: "Get solutions in under 3 seconds"
+                },
+                {
+                  icon: Sparkles,
+                  title: "3D Visualization",
+                  description: "Interactive cube with step-by-step guidance"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.2 + (index * 0.2) }}
+                >
+                  <Card className="glass-card p-6 hover-lift-3d group">
+                    <feature.icon className="w-10 h-10 text-primary mb-4 group-hover:scale-110 transition-transform duration-300" />
+                    <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
