@@ -243,7 +243,7 @@ const Solution = () => {
         </Button>
         
         <div className="text-center">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-gradient-primary">
             Solution Generator
           </h1>
           <Badge variant="outline" className="mt-2 neon-border">
@@ -276,7 +276,7 @@ const Solution = () => {
           <h2 className="text-4xl lg:text-6xl font-black mb-4">
             <span className="text-foreground">Solution</span>
             <br />
-            <span className="bg-gradient-primary bg-clip-text text-transparent">Generated!</span>
+            <span className="text-gradient-primary">Generated!</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Your cube can be solved in {solutionSteps.length} moves. Follow the steps below or watch the 3D animation.

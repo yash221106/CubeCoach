@@ -37,7 +37,7 @@ const Index = () => {
         {/* Header */}
         <nav className="p-6 lg:p-8 flex justify-between items-center">
           <motion.div 
-            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
+            className="text-2xl font-bold text-gradient-primary"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
@@ -86,7 +86,7 @@ const Index = () => {
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
                   <span className="text-foreground block">Solve Your</span>
-                  <span className="bg-gradient-primary bg-clip-text text-transparent animate-glow block">
+                  <span className="text-gradient-primary animate-glow block">
                     Rubik's Cube
                   </span>
                 </motion.h1>
